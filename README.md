@@ -1,13 +1,17 @@
 # Foobar
 
-Foobar is a Python library for dealing with word pluralization.
+Expense Tracking App
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
+Use the package manager [Clone](https://github.com/amineelkhayari/ExpenseTrack) This Project.
 
 ```bash
-pip install foobar
+npm install
+```
+Or
+```bash
+npm i
 ```
 
 ## Usage
