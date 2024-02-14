@@ -3,11 +3,12 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, StatusBar, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RadioButton } from 'react-native-paper';
-import { Storage } from '@/Interfaces/Storage';
+import { str } from '@/Interfaces/Storage';
+import { dt } from '@/Interfaces/Database';
 
 
 export default function TabOneScreen() {
-  const str = new Storage();
+  //const str = new Storage();
 
   const [selectedUser, setselectedUser] = useState("0");
   const [t, SetT] = useState(false);
@@ -68,6 +69,12 @@ export default function TabOneScreen() {
               if (selectedUser != '0') {
                 SetT(true)
                 str.storeData('Use', selectedUser);
+                // dt.SetUpDataBase(`CREATE TABLE if NOT EXISTS categoery (
+                //   IdCat INTEGER PRIMARY KEY AUTOINCREMENT,
+                //   NameCat TEXT NOT NULL UNIQUE
+                  
+                // );
+                // `)
 
               }
               else {
@@ -85,13 +92,18 @@ export default function TabOneScreen() {
 
       <TouchableOpacity key="GetData" style={styles.textInput} onPress={async () => {
 
-                console.log("t Vallue",selectedUser)
-                let vat = ( t===false) && 'lll';
-        str.removeValue("Use")
-        SetT(false)
+        //         console.log("t Vallue",selectedUser)
+              let vat = ( t===false) && 'lll';
+         str.removeValue("Use")
+         SetT(false)
         setselectedUser("0")
-          console.log(t,"Data Load",vat)
-          str.getAllKeys()
+        //   console.log(t,"Data Load",vat)
+        // str.getAllKeys()
+
+        dt.getFromTable('SELECT * FROM categoery WHERE IdCat = ?  ',[1])
+
+       //
+
 
 
          // alert(await str.getData('User'));

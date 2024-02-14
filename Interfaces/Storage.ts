@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 // generic Class Reusable for All App
-export class Storage{
+class Storage{
 constructor(){}
 
   // Method for save Data On lcoal storage
@@ -91,3 +91,5 @@ constructor(){}
 
 
 }
+
+export const str: Storage = new Storage();
