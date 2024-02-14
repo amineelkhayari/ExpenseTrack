@@ -1,38 +1,44 @@
 import { users } from '@/constants/user';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, StatusBar, TouchableOpacity } from 'react-native';
-import { Picker } from "@react-native-picker/picker";
-import { setBackgroundColorAsync } from 'expo-system-ui';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RadioButton } from 'react-native-paper';
-import { Item } from 'react-native-paper/lib/typescript/components/Drawer/Drawer';
 import { Storage } from '@/Interfaces/Storage';
 
 
 export default function TabOneScreen() {
+  const str = new Storage();
+
   const [selectedUser, setselectedUser] = useState("0");
   const [t, SetT] = useState(false);
-  const str = new Storage();
-  useEffect(()=>{
-    getUser()
+  const [test, SetTest] = useState(async () => {
+    let va = await str.getData('Use')
+    //selectedUser == va;
+    //alert(t)
+    if(va === undefined) confirm(selectedUser)//setselectedUser(va)
+    
+    else{
+      setselectedUser(va)
+      SetT(true)
+      //console.log(selectedUser,"Value get from Storage",va)
+      return true;
+    }
 
   });
-const getUser = async () => {
-  const va = await str.getData('User')
-  if(va != "undefined"){
-    SetT(true)
-    setselectedUser(va)
-  }
 
-}
+ 
 
 
   return (
     <SafeAreaView >
+       
+            <Text style={styles.title}> Welcome Back Mrs :: {selectedUser}</Text>
 
+          
 
       {
-        (t == false) ? (
+        
+       ( t===false ) && (
           <>
             <View style={styles.radioGroup}>
 
@@ -42,7 +48,7 @@ const getUser = async () => {
                   <View style={styles.radioButton}>
                     <RadioButton.Android
                       value={user.Name}
-                      key={index * 4}
+                      key={user.Name}
                       status={selectedUser === user.Name ?
                         'checked' : 'unchecked'}
                       onPress={() => setselectedUser(user.Name)}
@@ -56,11 +62,12 @@ const getUser = async () => {
               })}
             </View>
 
-            <TouchableOpacity style={styles.textInput} onPress={() => {
+            <TouchableOpacity key="StoreData" style={styles.textInput} onPress={() => {
 
 
-              if (selectedUser != '0') {SetT(true)
-                str.storeData('User', selectedUser);
+              if (selectedUser != '0') {
+                SetT(true)
+                str.storeData('Use', selectedUser);
 
               }
               else {
@@ -73,17 +80,24 @@ const getUser = async () => {
 
           </>
 
-        ) : (
-
-          <>
-            <Text style={styles.title}> Welcome Back Mrs :: {selectedUser}</Text>
-
-          </>
-        )
+        ) 
       }
 
+      <TouchableOpacity key="GetData" style={styles.textInput} onPress={async () => {
 
-   
+                console.log("t Vallue",selectedUser)
+                let vat = ( t===false) && 'lll';
+        str.removeValue("Use")
+        SetT(false)
+        setselectedUser("0")
+          console.log(t,"Data Load",vat)
+          str.getAllKeys()
+
+
+         // alert(await str.getData('User'));
+
+      }}><Text style={{ textAlign: 'center' }}>Remove User</Text></TouchableOpacity>
+
 
 
     </SafeAreaView >
