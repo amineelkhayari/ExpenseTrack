@@ -1,11 +1,10 @@
 import React, { useState, useEffect,FC } from 'react';
 import { View, Text, Button } from 'react-native';
-import Database,{IData} from '@/Interfaces/DbSet';
+import {db,IData} from '@/Interfaces/DbSet';
 
 
 const TaskScreen: FC = () => {
   const [tasks, setTasks] = useState<IData[]>([]);
-  const db = new Database();
 
   useEffect(() => {
     db.createTable('tasks', ['title', 'description']);

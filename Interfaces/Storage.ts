@@ -23,8 +23,8 @@ constructor(){}
       const value = await AsyncStorage.getItem(key);
       if (value !== null) {
         // value previously stored
-        //let val = JSON.parse(value);
-        return value
+        let val = JSON.parse(value);
+        return val
       }
     } catch (e) {
       // error reading value
