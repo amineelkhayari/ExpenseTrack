@@ -1,29 +1,37 @@
 import React, { useState, useEffect,FC } from 'react';
-import { View, Text, Button } from 'react-native';
+import { View, Text, Button,TextInput } from 'react-native';
 import {db,IData} from '@/Interfaces/DbSet';
+import CustomListItem from '@/components/CustomListing';
 
 
-const TaskScreen: FC = () => {
+const TaskScreen = () => {
   const [tasks, setTasks] = useState<IData[]>([]);
+  const [t, setTask] = useState<IData[]>([]);
+
+  const [Category,SetCategory]:any = useState();
 
   useEffect(() => {
-    db.createTable('tasks', ['title', 'description']);
     fetchData();
   }, []);
-
+ 
   const fetchData = () => {
-    db.fetchData('tasks', setTasks);
+    db.fetchData('category', setTasks);
+    //db.fetchDataQuery("SELECT SUM(Amount) FROM Expense",setTask)
   };
 
   const addTask = () => {
-    db.addItem('tasks', { title: 'New ', description: 'Description' }, fetchData);
+    
+   db.addItem('category', { NameCat: Category.trim() }, fetchData);
   };
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Text>Tasks:</Text>
+      <TextInput value={Category}
+      placeholder='food'
+      onChangeText={(val)=>SetCategory(val)} />
       {tasks.map(task => (
-        <Text key={task.id}>{task.title}</Text>
+        <Text key={task.ID}>{task.ID}:{task.NameCat}</Text>
       ))}
       <Button onPress={addTask} title="Add Task" />
     </View>

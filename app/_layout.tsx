@@ -3,8 +3,9 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useColorScheme } from 'react-native';
+import { db, IData } from '@/Interfaces/DbSet';
 
 
 export {
@@ -21,6 +22,7 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+
   const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     ...FontAwesome.font,
@@ -33,6 +35,41 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (loaded) {
+      db.createTableManually(`
+       
+CREATE TABLE if NOT EXISTS category (
+	ID INTEGER PRIMARY KEY AUTOINCREMENT,
+	NameCat TEXT NOT NULL UNIQUE
+	
+);
+CREATE TABLE if NOT EXISTS subCategory (
+	ID INTEGER PRIMARY KEY AUTOINCREMENT,
+	NameSubCat TEXT NOT NULL UNIQUE,
+	catID INTEGER,
+	  FOREIGN KEY (catID) 
+      REFERENCES category (IdCat) 
+         ON DELETE CASCADE 
+         ON UPDATE NO ACTION
+	
+);
+CREATE TABLE if NOT EXISTS Expense (
+	ID INTEGER PRIMARY KEY AUTOINCREMENT,
+	Title TEXT,
+	PaymentTransaction TEXT UNIQUE,
+    DateExpense DATE DEFAULT (datetime('now','localtime')),
+	PayedBy TEXT NOT NULL,
+	Amount REAL NOT NULL,
+	Structure TEXT,
+	IdSubCat INTEGER,
+	 FOREIGN KEY (IdSubCat) 
+      REFERENCES subCategory (IdCat) 
+         ON DELETE CASCADE 
+         ON UPDATE NO ACTION   
+	
+);
+
+
+      `);
       SplashScreen.hideAsync();
     }
   }, [loaded]);
@@ -48,7 +85,7 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={ DefaultTheme}>
+    <ThemeProvider value={DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />

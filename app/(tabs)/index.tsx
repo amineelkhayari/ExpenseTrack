@@ -6,6 +6,7 @@ import { Avatar, RadioButton } from 'react-native-paper';
 import { str } from '@/Interfaces/Storage';
 import { Feather } from '@expo/vector-icons';
 import CustomListItem from '@/components/CustomListing';
+import Selection from '@/components/Selection';
 
 
 export default function TabOneScreen() {
@@ -88,7 +89,7 @@ export default function TabOneScreen() {
           </>
 
         ) : (
-          <><View style={styles.fullName}>
+          <View><View style={styles.fullName}>
               <Avatar.Image size={60} source={require('../../assets/images/spending.png')} />
 
 
@@ -99,7 +100,8 @@ export default function TabOneScreen() {
                 {selectedUser}
               </Text>
             </View>
-          </View><View style={styles.card}>
+          </View>
+          <View style={styles.card}>
               <View style={styles.cardTop}>
                 <Text style={{ textAlign: 'center', color: 'aliceblue' }}>
                   Total Expense
@@ -138,10 +140,9 @@ export default function TabOneScreen() {
                 </View>
               </View>
             </View>
+             {/* Start for Recent Transaction */}
 
-            {/* Start for Recent Transaction */}
-
-            <View style={styles.recentTitle}>
+             <View style={styles.recentTitle}>
               <Text style={{ color: '#4A2D5D' }}>
                 Recent Transactions
               </Text>
@@ -152,25 +153,28 @@ export default function TabOneScreen() {
                 <Text style={styles.seeAll}>See All</Text>
               </TouchableOpacity>
             </View>
-
-
+          
+            
             {/* Loop for transaction */}
+            <View style={{flex:1, flexDirection:"row", height:"auto"}}>
+            <CustomListItem
+                  
+                  />
+            </View>
 
-            <View style={styles.recentTransactions}>
+           
+
+            <View >
               {/* loop */}
-              <View key="1">
-                <CustomListItem
-                  info=""
-                  navigation=""
-                  id=""
-                />
-              </View>
+              
               {/* endLoop */}
             </View>
 
+            
 
 
-          </>
+
+          </View>
         )
       }
 
@@ -252,9 +256,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   card: {
-    backgroundColor: '#535F93',
     alignItems: 'center',
-    width: '100%',
+    justifyContent: 'space-between',
+    backgroundColor: '#535F93',
+    
     padding: 10,
     borderRadius: 10,
     shadowColor: '#000',

@@ -3,35 +3,53 @@ import { Button, Dimensions, Platform, StyleSheet, Text, TextInput, View } from 
 import { useState } from 'react';
 import { Picker } from '@react-native-picker/picker';
 import { users } from '@/constants/user';
-import Database from '@/Interfaces/DbSet';
+import { str } from '@/Interfaces/Storage';
+import { useNavigation } from 'expo-router';
 
 
 export default function ModalScreen() {
-  const [exName, SetExName]: any = useState();
-  const [amount, setAmount]: any = useState();
-  const [payWith, SetPayWith]: any = useState();
-  const [data,setUserData]:any = useState()
-  
+  const navigation = useNavigation();
+
+  const [Title, SetTitle]: any = useState();
+  const [PayedBy, SetPayedBy]: any = useState();
+  const [Amount, setAmount]:any = useState();
+  const [Structure, SetStructure]: any = useState();
+
+  const [data, setUserData]: any = useState()
+  const [test, SetTest] = useState<any>(async () => {
+    let va = await str.getData('Use')
+    //selectedUser == va;
+    //alert(t)
+    if (va === undefined) {
+      alert("please Select user First")
+      navigation.goBack()
+    }
+
+    else {
+      SetPayedBy(va)
+      SetTest(va)
+      return va;
+      //console.log(selectedUser,"Value get from Storage",va)
+    }
+
+  });
+
 
   const add = () => {
     alert(1)
     // Create an instance of Database
-    const db = new Database();
+    //const db = new Database();
 
     // Define table structure
     const userColumns = ['name', 'age'];
 
+
     // Create user table
-    db.createTable('users', userColumns);
-    db.addItem('users', { name: 'John', age: 30 }, ()=>{
-
-      console.log("Loaded")
-    });
-    ;
-    console.log("Data Fetched",db.fetchData('users',setUserData))
 
 
- 
+
+
+
 
 
   }
@@ -45,21 +63,21 @@ export default function ModalScreen() {
       {/* Input field for expense name */}
       <Text style={styles.label}>Expense Name</Text>
       <TextInput
-        onChangeText={(value) => SetExName(value)}
+        onChangeText={(value) => SetTitle(value)}
         style={styles.textInput}
         placeholder="Enter the expense name"
-        value={exName}
+        value={Title}
       />
-      {/* Input field for expense amount */}
+      {/* Input field for expense Amount */}
       <Text style={styles.label}>Amount</Text>
       <TextInput
         keyboardType="number-pad"
         onChangeText={(value) => {
-          // Ensure only numeric values are entered for the amount
+          // Ensure only numeric values are entered for the Amount
           value = value.replace(/[^0-9]/g, "");
           setAmount(value)
         }}
-        value={amount}
+        value={Amount}
         style={styles.textInput}
         placeholder="[0-9]"
       />
@@ -70,16 +88,16 @@ export default function ModalScreen() {
 
       <Picker
         style={styles.textInput}
-        selectedValue={payWith}
+        selectedValue={PayedBy}
         onValueChange={(itemValue, itemIndex) => {
-          SetPayWith(itemValue)
+          SetPayedBy(itemValue)
         }}
       >
         {users.map((user, index) => {
           return (
             <Picker.Item
               key={user.ID}
-              label={user.Name}
+              label={user.Name === test ? "Me " : user.Name}
               value={user.Name}
             />
           );

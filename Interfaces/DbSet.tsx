@@ -4,7 +4,7 @@ import * as SQLite from 'expo-sqlite';
 
 
 export interface IData {
-  id: number;
+  ID: number;
   [key: string]: any;
 }
 
@@ -12,9 +12,18 @@ class Database {
   db: SQLite.Database;
 
   constructor() {
-    this.db = SQLite.openDatabase('local.db');
+    this.db = SQLite.openDatabase('ExpensesTrackers.db');
   }
 
+  createTableManually = (tableName: string) => {
+    
+    this.db.transaction(tx => {
+      tx.executeSql(
+        tableName
+      );
+    });
+    console.log("Data base Created")
+  };
   createTable = (tableName: string, columns: string[]) => {
     const columnsString = columns.map(col => `${col} TEXT`).join(', ');
     this.db.transaction(tx => {
@@ -24,16 +33,45 @@ class Database {
     });
     console.log("Data base Created")
   };
-
-  fetchData = (tableName: string, setData: React.Dispatch<React.SetStateAction<IData[]>>) => {
+  fetchDataQuery  = (query: string, setData: React.Dispatch<React.SetStateAction<IData[]>>,
+   
+    ) => {
+      
+      
     this.db.transaction(tx => {
-      tx.executeSql(`SELECT * FROM ${tableName};`, [], (_, { rows }) => {
+      tx.executeSql(query, [], (_, { rows }) => {
         const items: IData[] = [];
         for (let i = 0; i < rows.length; i++) {
           items.push(rows.item(i));
         }
         setData(items);
-        console.log(setData)
+        console.log(items)
+      });
+    });
+  };
+  fetchData = (tableName: string, setData: React.Dispatch<React.SetStateAction<IData[]>>,
+    data?:Partial<IData>
+    ) => {
+      let values:any=[]
+      let columns:string;
+      if(data!=null)
+      {
+        
+
+       columns = "WHERE "+Object.keys(data).join(' = ? AND ')+"= ?";
+       values = Object.values(data);
+      console.log("columns: ",columns+" = ?")
+      console.log(`SELECT * FROM ${tableName} ${columns} ;`,values)
+
+      }
+    this.db.transaction(tx => {
+      tx.executeSql(`SELECT * FROM ${tableName} ${columns} ;`, values, (_, { rows }) => {
+        const items: IData[] = [];
+        for (let i = 0; i < rows.length; i++) {
+          items.push(rows.item(i));
+        }
+        setData(items);
+        console.log(items)
       });
     });
   };
@@ -48,7 +86,10 @@ class Database {
        (txtObj, res) => {
         console.log("data: ",res.insertId)
         fetchData();
-      });
+      }
+
+      
+      );
     });
   };
 }
