@@ -11,8 +11,14 @@ export interface IData {
 class Database {
   db: SQLite.Database;
 
+  
+  destroy(){
+
+  }
   constructor() {
     this.db = SQLite.openDatabase('ExpensesTrackers.db');
+    
+
   }
 
   createTableManually = (tableName: string) => {
@@ -65,10 +71,10 @@ class Database {
 
       }
     this.db.transaction(tx => {
-      tx.executeSql(`SELECT * FROM ${tableName} ${columns} ;`, values, (_, { rows }) => {
+      tx.executeSql(`SELECT * FROM ${tableName} ${columns} ;`, values, (_, res) => {
         const items: IData[] = [];
-        for (let i = 0; i < rows.length; i++) {
-          items.push(rows.item(i));
+        for (let i = 0; i < res.rows.length; i++) {
+          items.push(res.rows.item(i));
         }
         setData(items);
         console.log(items)

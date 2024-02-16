@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { TaskScreen } from './Hello';
+import { SubCatCRUD, TaskScreen } from './Hello';
 
 
 
@@ -7,7 +7,7 @@ export default function TabTwoScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tab Two</Text>
-      <TaskScreen />
+      <SubCatCRUD />
     </View>
   );
 }
