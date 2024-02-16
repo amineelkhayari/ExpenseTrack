@@ -1,21 +1,30 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, Dimensions, Platform, StyleSheet, Text, TextInput, View } from 'react-native';
-import { useState } from 'react';
+import { Button, Dimensions, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
 import { Picker } from '@react-native-picker/picker';
 import { users } from '@/constants/user';
 import { str } from '@/Interfaces/Storage';
 import { useNavigation } from 'expo-router';
+import { IData, db } from '@/Interfaces/DbSet';
 
 
 export default function ModalScreen() {
   const navigation = useNavigation();
 
   const [Title, SetTitle]: any = useState();
+  const [PayTransaction, SetPayTransaction]: any = useState()
+
   const [PayedBy, SetPayedBy]: any = useState();
-  const [Amount, setAmount]:any = useState();
+  const [Amount, setAmount]: any = useState(0);
+  const [SouAmount, SetSouAmount]: any = useState(0);
   const [Structure, SetStructure]: any = useState();
 
-  const [data, setUserData]: any = useState()
+
+  const [userSelected, setUserSelected]: any = useState([]);
+  const [opencard, SetPoenCard] = useState(0);
+  const [perPerson, SetPerPerson]: any = useState();
+  const [subCateList, SetsubCateList] = useState<IData[]>([]);
+
   const [test, SetTest] = useState<any>(async () => {
     let va = await str.getData('Use')
     //selectedUser == va;
@@ -28,13 +37,24 @@ export default function ModalScreen() {
     else {
       SetPayedBy(va)
       SetTest(va)
+      SetPayTransaction(va + new Date().getTime())
+      fetchData();
+      db.fetchDataQuery("select * from subCategory",SetsubCateList);
       return va;
       //console.log(selectedUser,"Value get from Storage",va)
     }
 
   });
+  const [categoryList, SetCategoryList] = useState<IData[]>([]);
+  const [catSelected, SetCatSelect] = useState(0);
+  const [SubCatSelected, SetSubCatSelect] = useState(0);
 
+  const fetchData = () => {
+    db.fetchData('category', SetCategoryList);
+    console.log('11')
 
+    //db.fetchDataQuery("SELECT SUM(Amount) as expense FROM Expense",setTask)
+  };
   const add = () => {
     alert(1)
     // Create an instance of Database
@@ -46,19 +66,18 @@ export default function ModalScreen() {
 
     // Create user table
 
-
-
-
-
-
-
   }
+  useEffect(() => {
+    SetSouAmount((Amount / (userSelected.length + 1)).toFixed(2))
+    
+
+  }, [])
 
   return (
     <View style={styles.container}>
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'dark'} />
 
-      <Text style={styles.heading3}>Add An Expense </Text>
+      <Text style={styles.heading3}>Expense Transaction Serie: {PayTransaction} </Text>
 
       {/* Input field for expense name */}
       <Text style={styles.label}>Expense Name</Text>
@@ -81,6 +100,7 @@ export default function ModalScreen() {
         style={styles.textInput}
         placeholder="[0-9]"
       />
+      {/* Add categoeru and sub cat */}
 
 
 
@@ -104,6 +124,105 @@ export default function ModalScreen() {
         })}
       </Picker>
 
+      {/* Add who shared payed */}
+      <View style={styles.card}>
+        {opencard != 2 && (
+          <TouchableOpacity key={opencard} style={styles.cardPreview} onPress={() => SetPoenCard(2)}>
+
+            <Text style={styles.previewText}>Select User</Text>
+            <Text style={styles.previewdData}>{userSelected.length + 1}/{users.length}</Text>
+
+          </TouchableOpacity>
+        )}
+        {opencard === 2 && (
+          <>
+            <TouchableOpacity style={styles.cardPreview} onPress={() => {
+              SetPoenCard(0)
+            }}>
+              <Text style={styles.cardHeader}>User Selected : </Text>
+            </TouchableOpacity>
+            <View style={styles.cardBody}>
+
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {users.filter((item, i) => item.Name != PayedBy.trim()).map((item, i) => (
+
+                  <TouchableOpacity key={i} style={item.isChecked == true && styles.placeSelected} onPress={() => {
+                    //user[userSelected].isChecked = !user[userSelected].isChecked;
+                    if (userSelected.includes(item.ID) === false) {
+                      console.log("exlude", PayedBy.trim())
+                      setUserSelected([...userSelected, item.ID])
+
+                    } else {
+                      let clone: any[] = [...userSelected];
+                      let index = clone.findIndex(i => i == item.ID);
+                      clone.splice(index, 1);
+                      setUserSelected([...clone])
+
+                      console.log(index, 'clone', clone);
+                    }
+                    //console.log(userSelected,userSelected.length)                
+                  }} >
+                    <Text style={userSelected.includes(item.ID) == true ? styles.placeSelected : styles.place} >{item.Name}/{SouAmount}</Text>
+                  </TouchableOpacity>
+                ))}
+
+
+              </ScrollView>
+
+            </View>
+
+          </>
+
+        )}
+      </View>
+
+      {/* Select Category and sub category */}
+      <Text style={styles.label}>Select Category: </Text>
+
+      <Picker
+        style={{ width: "100%" }}
+        selectedValue={catSelected}
+        onValueChange={(itemValue, itemIndex) => {
+          SetCatSelect(itemValue)
+        }}
+      >
+        <Picker.Item
+          key={0}
+          label="Choose Cat"
+          value={0}
+        />
+        {categoryList.map((cat, index) => {
+          return (
+            <Picker.Item
+              key={cat.ID}
+              label={cat.NameCat}
+              value={cat.ID}
+            />
+          );
+        })}
+      </Picker>
+      <Picker
+        style={{ width: "100%" }}
+        selectedValue={SubCatSelected}
+        onValueChange={(itemValue, itemIndex) => {
+          SetSubCatSelect(itemValue)
+        }}
+      >
+        <Picker.Item
+          key={0}
+          label="Choose Sub Cat"
+          value={0}
+        />
+        {subCateList.filter(cat=>cat.catID=== catSelected).map((cat, index) => {
+          return (
+            <Picker.Item
+              key={cat.ID}
+              label={cat.NameSubCat}
+              value={cat.ID}
+            />
+          );
+        })}
+      </Picker>
 
       <View style={styles.row}>
         {/* Add Expense button */}
