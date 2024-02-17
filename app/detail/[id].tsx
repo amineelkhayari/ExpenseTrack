@@ -3,6 +3,8 @@ import React, { useLayoutEffect } from 'react';
 import { Button, View, Text, StyleSheet, Image, Dimensions, TouchableOpacity, Share, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {base64} from "@/Interfaces/helper"
+import QRCode from 'react-native-qrcode-svg';
+
 
 const IMG_HEIGHT = 300;
 const { width } = Dimensions.get('window');
@@ -53,7 +55,7 @@ const page = () => {
   return (
     <View >
       <Text>{base64.btoa(id)} Local</Text>
-      
+      <QRCode value={id} />
       <Button onPress={() => {
 
         // log out Buffer
