@@ -49,29 +49,53 @@ export default function ModalScreen() {
   const [catSelected, SetCatSelect] = useState(0);
   const [SubCatSelected, SetSubCatSelect] = useState(0);
 
+
+  const [ExpenseList, SetExpenseList] = useState<IData[]>([]);
+  const fetchExpense = ()=>{
+    db.fetchData("Expense",SetExpenseList);
+  }
+
   const fetchData = () => {
     db.fetchData('category', SetCategoryList);
-    console.log('11')
+    
 
     //db.fetchDataQuery("SELECT SUM(Amount) as expense FROM Expense",setTask)
   };
   const add = () => {
-    alert(1)
-    // Create an instance of Database
-    //const db = new Database();
 
-    // Define table structure
-    const userColumns = ['name', 'age'];
+    let str:any ={
+      "shared":userSelected,
+      "Payed" :[]
+  }
+    
+    const data={Title:Title, 
+      PaymentTransaction:PayTransaction,
+      PayedBy:PayedBy,
+      Amount:Amount,
+      Structure:JSON.stringify(str),
+      IdSubCat:SubCatSelected
+    }
+    
+    
+      db.addItem('Expense',data,fetchExpense);
+      SetTitle();
+      SetPayTransaction(PayedBy+new Date().getTime())
+      setAmount(0)
+      SetStructure()
+      SetSubCatSelect(0)
+      SetCatSelect(0)
+      setUserSelected([])
 
+     
+    //console.log(data)
 
     // Create user table
 
   }
   useEffect(() => {
     SetSouAmount((Amount / (userSelected.length + 1)).toFixed(2))
-    
 
-  }, [])
+  }, [userSelected])
 
   return (
     <View style={styles.container}>
@@ -231,6 +255,7 @@ export default function ModalScreen() {
 
           onPress={() => {
             add();
+            
             // Update the chart data to reflect the new expense
 
           }}
@@ -241,7 +266,7 @@ export default function ModalScreen() {
         {/* Cancel button to close the form
 					without adding an expense */}
         <Button
-          onPress={() => { }}
+          onPress={() => { fetchExpense()}}
           title="Cancel"
           key="Cancel"
         />

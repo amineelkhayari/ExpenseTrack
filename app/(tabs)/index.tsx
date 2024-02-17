@@ -1,19 +1,31 @@
 import { users } from '@/constants/user';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, StatusBar, TouchableOpacity } from 'react-native';
+import { Button, StyleSheet, Text, View, StatusBar, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Avatar, RadioButton } from 'react-native-paper';
 import { str } from '@/Interfaces/Storage';
 import { Feather } from '@expo/vector-icons';
 import CustomListItem from '@/components/CustomListing';
 import Selection from '@/components/Selection';
+import { IData, db } from '@/Interfaces/DbSet';
+import { Expense, Expenses } from '@/Interfaces/Users';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
-
+type Props = {
+  item: Expense
+  index: number
+}
 export default function TabOneScreen() {
   //const str = new Storage();
 
   const [selectedUser, setselectedUser] = useState("0");
   const [t, SetT] = useState(false);
+
+
+  const [Expensed, SetExpensed] = useState(0);
+  const [Credit, SetCredit]: any = useState(0.0);
+  const [debt, Setdebt]: any = useState(0.0);
+
   const [test, SetTest] = useState(async () => {
     let va = await str.getData('Use')
     //selectedUser == va;
@@ -24,11 +36,61 @@ export default function TabOneScreen() {
       setselectedUser(va)
       SetT(true)
       //console.log(selectedUser,"Value get from Storage",va)
+      //fetchExpense()
+
       return true;
     }
 
   });
 
+
+
+
+  const [ExpenseList, SetExpenseList] = useState<IData[]>([]);
+  useEffect(() => {
+    fetchExpense()
+    console.log("test")
+  }, []);
+
+  const fetchExpense = () => {
+    db.fetchDataQuery(`
+    SELECT * from Expense, subCategory, category
+    WHERE Expense.IdSubCat=subCategory.ID AND subCategory.catID=category.ID
+    AND strftime('%m', DateExpense) =  strftime('%m', datetime('now','localtime'))
+    `, SetExpenseList);
+    //console.log(ExpenseList)
+
+
+    let exp = 0
+    let debt = 0
+    let credit = 0
+    ExpenseList.map((item, index) => {
+      console.log("add", ExpenseList)
+      let usercreadit = JSON.parse(item.Structure);
+
+      if (item.PayedBy === selectedUser) {
+        exp += item.Amount;
+        let userLenght = usercreadit.shared.length;
+        if (userLenght > 0) {
+          credit += item.Amount / (userLenght + 1) * userLenght;
+
+        }
+        console.log("User by me",)
+
+      }
+      else debt += (item.Amount / (usercreadit.shared.length + 1));
+      //console.log(usercreadit.shared.length)
+
+    })
+
+
+    SetExpensed(exp)
+    Setdebt(debt)
+    SetCredit(credit);
+    console.log("Expense: ", exp, "Debt", debt)
+
+
+  }
 
 
 
@@ -90,26 +152,38 @@ export default function TabOneScreen() {
 
         ) : (
           <View><View style={styles.fullName}>
-              <Avatar.Image size={60} source={require('../../assets/images/spending.png')} />
+            <Avatar.Image size={60} source={require('../../assets/images/spending.png')} />
 
 
             <View style={{ marginLeft: 10 }}>
-            <Text style={{ fontWeight: 'bold', fontSize: 20 }}>Welcome Mrs :</Text>
+              <Text style={{ fontWeight: 'bold', fontSize: 20 }}>Welcome Mrs :</Text>
 
               <Text style={{ color: '#4A2D5D', fontSize: 20 }}>
                 {selectedUser}
               </Text>
             </View>
           </View>
-          <View style={styles.card}>
+            <View style={styles.card}>
+            <View style={styles.cardBottom}>
+              <TouchableOpacity  onPress={() => {
+                    fetchExpense()
+                  }}
+                  >
+                    <FontAwesome size={25}  name="refresh" />
+                  </TouchableOpacity>
+              </View>
+            
               <View style={styles.cardTop}>
-                <Text style={{ textAlign: 'center', color: 'aliceblue' }}>
-                  Total Expense
+              
+                <Text style={{ textAlign: 'center', color: 'aliceblue', flexDirection:"row",justifyContent:"space-between" }}>
+                  Total Expense 
+                  
                 </Text>
-                <Text style={{ fontSize:20,textAlign: 'center', color: 'aliceblue' }}>
-                  $ 100
+                <Text style={{ fontSize: 20, textAlign: 'center', color: 'aliceblue' }}>
+                  $ {Expensed}
                 </Text>
               </View>
+              
               <View style={styles.cardBottom}>
                 <View>
                   <View style={styles.cardBottomSame}>
@@ -124,7 +198,7 @@ export default function TabOneScreen() {
                     </Text>
                   </View>
                   <Text style={{ textAlign: 'center' }}>
-                    {`$ 30`}
+                    $ {Credit}
                   </Text>
                 </View>
                 <View>
@@ -135,14 +209,14 @@ export default function TabOneScreen() {
                     </Text>
                   </View>
                   <Text style={{ textAlign: 'center' }}>
-                    {`$ 15,00`}
+                    $ {debt}
                   </Text>
                 </View>
               </View>
             </View>
-             {/* Start for Recent Transaction */}
+            {/* Start for Recent Transaction */}
 
-             <View style={styles.recentTitle}>
+            <View style={styles.recentTitle}>
               <Text style={{ color: '#4A2D5D' }}>
                 Recent Transactions
               </Text>
@@ -153,24 +227,26 @@ export default function TabOneScreen() {
                 <Text style={styles.seeAll}>See All</Text>
               </TouchableOpacity>
             </View>
-          
-            
+
+
             {/* Loop for transaction */}
-            <View style={{flex:1, flexDirection:"row", height:"auto"}}>
-            <CustomListItem
-                  
-                  />
+            <View style={{ flex: 1, flexDirection: "row", height: "auto" }}>
+              <CustomListItem
+              expenseList={ExpenseList}
+              userLocal={selectedUser}
+
+              />
             </View>
 
-           
+
 
             <View >
               {/* loop */}
-              
+
               {/* endLoop */}
             </View>
 
-            
+
 
 
 
@@ -259,7 +335,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#535F93',
-    
+
     padding: 10,
     borderRadius: 10,
     shadowColor: '#000',

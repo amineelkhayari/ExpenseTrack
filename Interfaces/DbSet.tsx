@@ -82,7 +82,7 @@ class Database {
     });
   };
 
-  addItem = (tableName: string, data: Partial<IData>, fetchData: () => void) => {
+  addItem = (tableName: string, data: Partial<IData>, fetchData?: () => void) => {
     const columns = Object.keys(data).join(',');
     const placeholders = Object.keys(data).fill('?').join(',');
     const values = Object.values(data);
@@ -90,8 +90,8 @@ class Database {
       tx.executeSql(`INSERT INTO ${tableName} (${columns}) VALUES (${placeholders});`,
        values, 
        (txtObj, res) => {
-        console.log("data: ",res.insertId)
-        fetchData();
+        alert("This Item add With Id : "+res.insertId)
+        if(fetchData!=null) fetchData();
       }
 
       
