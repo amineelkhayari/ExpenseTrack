@@ -38,7 +38,7 @@ const Item = ({ item,userSelect, onPress, backgroundColor, textColor }: ItemProp
     <View>
     <Text style={[ { color: textColor }]}>This Item `{item.Title}`</Text>
     <Text  style={[ { color: textColor }]}>Payed By: {item.PayedBy}</Text>
-    <Text  style={[ { color: textColor }]}>Payment Transsaction: Amine11334</Text>
+    <Text  style={[ { color: textColor }]}>Payment Transsaction: {item.PaymentTransaction}</Text>
 
     </View>
     <View>

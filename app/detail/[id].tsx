@@ -2,8 +2,12 @@ import { useLocalSearchParams, useNavigation } from 'expo-router';
 import React, { useLayoutEffect } from 'react';
 import { Button, View, Text, StyleSheet, Image, Dimensions, TouchableOpacity, Share, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import {base64} from "@/Interfaces/helper"
+import { base64 } from "@/Interfaces/helper"
 import QRCode from 'react-native-qrcode-svg';
+import { Expense, StrType, Users } from '@/Interfaces/Users';
+import { str } from '@/Interfaces/Storage';
+import { users } from '@/constants/user';
+import { IData, db } from '@/Interfaces/DbSet';
 
 
 const IMG_HEIGHT = 300;
@@ -11,6 +15,9 @@ const { width } = Dimensions.get('window');
 
 const page = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const fetchedData:any = JSON.parse(base64.btoa(id));
+  const Str:StrType = JSON.parse(fetchedData.Structure);
+  const prixPerPerson = fetchedData.Amount / (Str.shared.length+1)
 
   const navigation = useNavigation();
 
@@ -53,27 +60,78 @@ const page = () => {
   }, []);
 
   return (
-    <View >
-      <Text>{base64.btoa(id)} Local</Text>
-      <QRCode value={id} />
-      <Button onPress={() => {
+    <View style={{
+      flex:1
+    }} >
+      
+      <Text> Payment Transaction : {fetchedData.PaymentTransaction} </Text>
+      <Text> Title               : {fetchedData.Title}              </Text>
+      <Text> Payed By            : {fetchedData.PayedBy}</Text>
+      <Text> Amount              : {fetchedData.Amount}</Text>
+      <Text> Category            : {fetchedData.NameCat} / {fetchedData.NameSubCat}</Text>
+      {
+        Str.shared.map((struc,index)=>{
 
+         let sel = users.find(item => item.ID===struc)
+          return (
+            <><Text>{sel?.Name} :  {prixPerPerson }</Text></>
+          )
+        })
+
+          
+        
+      }
+      
+      
+
+
+
+
+
+      <View style={{
+        flexDirection:"row",
+        justifyContent:"center",
+        alignItems:"center"
+      }}>
+        <QRCode size={300}
+        quietZone={0}
+        value={id} />
+      </View>
+     <View style={{
+      position:"absolute",
+      bottom:5,
+      width:"100%"
+     }}>
+     <Button  onPress={() => {
+        // log out Buffer
+        
+       delete fetchedData.ID;
+
+       delete fetchedData.catID;
+       delete fetchedData.NameSubCat;
+       delete fetchedData.NameCat;
+       delete fetchedData.catID;
+
+       db.addItem('Expense',fetchedData);
+
+      
+        console.log(fetchedData)
+        
+      }} title="Import This Expense" />
+     </View>
+{/* 
+      <Button onPress={() => {
         // log out Buffer
         const bs64 = base64.atob("amine")
         alert(bs64)
         console.log(bs64)
-
-       
-
       }} title="Encode" />
       <Button onPress={() => {
-
-const ourBuffer = base64.btoa("YW1pbmU=");
-// log out Buffer
-alert(ourBuffer);
-console.log(ourBuffer)
-
-      }} title="Decode" />
+        const ourBuffer = base64.btoa("YW1pbmU=");
+        // log out Buffer
+        alert(ourBuffer);
+        console.log(ourBuffer)
+      }} title="Decode" /> */}
 
     </View>
   )
