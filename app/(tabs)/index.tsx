@@ -11,6 +11,7 @@ import { IData, db } from '@/Interfaces/DbSet';
 import { Expense, Expenses } from '@/Interfaces/Users';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
+
 type Props = {
   item: Expense
   index: number
@@ -49,7 +50,9 @@ export default function TabOneScreen() {
   const [ExpenseList, SetExpenseList] = useState<IData[]>([]);
   useEffect(() => {
     fetchExpense()
-    console.log("test")
+   
+
+
   }, []);
 
   const fetchExpense = () => {
@@ -57,7 +60,7 @@ export default function TabOneScreen() {
     SELECT * from Expense, subCategory, category
     WHERE Expense.IdSubCat=subCategory.ID AND subCategory.catID=category.ID
     AND strftime('%m', DateExpense) =  strftime('%m', datetime('now','localtime'))
-    `, SetExpenseList);
+    order by DateExpense DESC`, SetExpenseList);
     //console.log(ExpenseList)
 
 
