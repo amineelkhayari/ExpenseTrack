@@ -50,7 +50,7 @@ export default function TabOneScreen() {
   const [ExpenseList, SetExpenseList] = useState<IData[]>([]);
   useEffect(() => {
     fetchExpense()
-   
+
 
 
   }, []);
@@ -68,33 +68,61 @@ export default function TabOneScreen() {
     let exp = 0
     let debt = 0
     let credit = 0
+    let diff = 0;
     ExpenseList.map((item, index) => {
       //console.log("add", ExpenseList)
       let usercreadit = JSON.parse(item.Structure);
+
 
       if (item.PayedBy === selectedUser) {
         exp += item.Amount;
         let userLenght = usercreadit.Payed.length;
         //console.log("=====",usercreadit.Payed.length)
         if (userLenght > 0) {
-          for(let i = 0 ; i<userLenght; i++){
-            if(!usercreadit.Payed[i].Payed){
+          for (let i = 0; i < userLenght; i++) {
+            if (!usercreadit.Payed[i].Payed) {
               credit += item.Amount / (userLenght + 1);
 
-            }else{
+            } else {
               exp -= item.Amount / (userLenght + 1);
             }
 
           }
           //credit += item.Amount / (userLenght + 1) * userLenght;
-
-          
-          
         }
         console.log("User by me",)
 
       }
-      else debt += (item.Amount / (usercreadit.Payed.length + 1));
+      else {
+        let userLenght = usercreadit.Payed.length;
+        //debt += item.Amount / (userLenght + 1);
+        //console.log("=====",usercreadit.Payed.length)
+        if (userLenght > 0) {
+          //exp += item.Amount / (userLenght + 1);
+
+          for (let i = 0; i < userLenght; i++) {
+            //alert(selectedUser)
+            if(usercreadit.Payed[i].Name === selectedUser){
+              //console.log(usercreadit.Payed[i].Payed)
+              if(usercreadit.Payed[i].Payed){
+                console.log("expense: "+(exp+item.Amount/(userLenght+1)))
+                exp += item.Amount/(userLenght+1)
+              }else{
+                console.log("Debts: "+item.Amount/(userLenght+1))
+                debt+=item.Amount/(userLenght+1);
+
+              }
+
+             
+            }
+            
+
+          }
+          //credit += item.Amount / (userLenght + 1) * userLenght;
+        }
+
+
+      }
       //console.log(usercreadit.shared.length)
 
     })
@@ -180,26 +208,26 @@ export default function TabOneScreen() {
             </View>
           </View>
             <View style={styles.card}>
-            <View style={styles.cardBottom}>
-              <TouchableOpacity  onPress={() => {
-                    fetchExpense()
-                  }}
-                  >
-                    <FontAwesome size={25}  name="refresh" />
-                  </TouchableOpacity>
+              <View style={styles.cardBottom}>
+                <TouchableOpacity onPress={() => {
+                  fetchExpense()
+                }}
+                >
+                  <FontAwesome size={25} name="refresh" />
+                </TouchableOpacity>
               </View>
-            
+
               <View style={styles.cardTop}>
-              
-                <Text style={{ textAlign: 'center', color: 'aliceblue', flexDirection:"row",justifyContent:"space-between" }}>
-                  Total Expense 
-                  
+
+                <Text style={{ textAlign: 'center', color: 'aliceblue', flexDirection: "row", justifyContent: "space-between" }}>
+                  Total Expense
+
                 </Text>
                 <Text style={{ fontSize: 20, textAlign: 'center', color: 'aliceblue' }}>
                   $ {Expensed}
                 </Text>
               </View>
-              
+
               <View style={styles.cardBottom}>
                 <View>
                   <View style={styles.cardBottomSame}>
@@ -248,8 +276,8 @@ export default function TabOneScreen() {
             {/* Loop for transaction */}
             <View style={{ flex: 1, flexDirection: "row", height: "auto" }}>
               <CustomListItem
-              expenseList={ExpenseList}
-              userLocal={selectedUser}
+                expenseList={ExpenseList}
+                userLocal={selectedUser}
 
               />
             </View>

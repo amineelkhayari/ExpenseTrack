@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useNavigation } from 'expo-router';
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { Button, View, Text, StyleSheet, Image, Dimensions, TouchableOpacity, Share, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { base64 } from "@/Interfaces/helper"
@@ -31,7 +31,19 @@ const page = () => {
       console.log(err);
     }
   };
+  const [selectedUser, setselectedUser] = useState("")
+  useEffect( ()=>{
+    async function get() {
+      let va = await str.getData('Use')
+      setselectedUser(va)
+    }
+    get()
+
+  })
+  
+
   useLayoutEffect(() => {
+
     navigation.setOptions({
       headerTitle: '',
       headerTransparent: false,
@@ -73,7 +85,7 @@ const page = () => {
       <Text> Amount              : {fetchedData.Amount}</Text>
       <Text> Category            : {fetchedData.NameCat} / {fetchedData.NameSubCat}</Text>
       {
-       fetchedData.PayedBy === "Amine" ? (
+       fetchedData.PayedBy === selectedUser ? (
         Str.Payed.map((struc,index)=>{
 
           let sel = users.find(item => item.ID===struc.ID)
@@ -116,8 +128,8 @@ const page = () => {
              }}>
              <Text>{sel?.Name} :  {prixPerPerson }</Text>
              {
-               !struc.Payed  && struc.Name=="Amine" ? (
-                 <Button title="Pay" onPress={()=>{
+                struc.Name== selectedUser ? (
+                 <Button disabled={struc.Payed ? true : false } title={ struc.Payed ? "Payed": "Pay" } onPress={()=>{
                    struc.Payed=true;
                    fetchedData.Structure = JSON.stringify(Str);
                    //console.log(fetchedData)
