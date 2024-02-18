@@ -1,13 +1,13 @@
 import { useLocalSearchParams, useNavigation } from 'expo-router';
-import React, { useLayoutEffect } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { Button, View, Text, StyleSheet, Image, Dimensions, TouchableOpacity, Share, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { base64 } from "@/Interfaces/helper"
 import QRCode from 'react-native-qrcode-svg';
 import { Expense, StrType, Users } from '@/Interfaces/Users';
-import { str } from '@/Interfaces/Storage';
 import { users } from '@/constants/user';
 import { IData, db } from '@/Interfaces/DbSet';
+import { str } from '@/Interfaces/Storage';
 
 
 const IMG_HEIGHT = 300;
@@ -17,7 +17,7 @@ const page = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const fetchedData:any = JSON.parse(base64.btoa(id));
   const Str:StrType = JSON.parse(fetchedData.Structure);
-  const prixPerPerson = fetchedData.Amount / (Str.shared.length+1)
+  const prixPerPerson = fetchedData.Amount / (Str.Payed.length+1)
 
   const navigation = useNavigation();
 
@@ -59,6 +59,9 @@ const page = () => {
     });
   }, []);
 
+ 
+  
+
   return (
     <View style={{
       flex:1
@@ -70,13 +73,67 @@ const page = () => {
       <Text> Amount              : {fetchedData.Amount}</Text>
       <Text> Category            : {fetchedData.NameCat} / {fetchedData.NameSubCat}</Text>
       {
-        Str.shared.map((struc,index)=>{
+       fetchedData.PayedBy === "Amine" ? (
+        Str.Payed.map((struc,index)=>{
 
-         let sel = users.find(item => item.ID===struc)
-          return (
-            <><Text>{sel?.Name} :  {prixPerPerson }</Text></>
-          )
-        })
+          let sel = users.find(item => item.ID===struc.ID)
+          //console.log(sel)
+           return (
+             <View style={{ 
+               flexDirection:"row",
+               alignItems:"center",
+               justifyContent:"space-between"
+             }}>
+             <Text>{sel?.Name} :  {prixPerPerson }</Text>
+             {
+               !struc.Payed  ? (
+                 <Button title="Pay" onPress={()=>{
+                   struc.Payed=true;
+                   fetchedData.Structure = Str;
+                   db.UpdateItem("Expense",{Structure:JSON.stringify(Str)},"PaymentTransaction = '"+fetchedData.PaymentTransaction+"'")
+                   
+
+                   
+                 }} />
+               ) : (
+                 <Text>Is Payed</Text>
+               )
+             }
+             
+             </View>
+           )
+         })
+       ):(
+        Str.Payed.map((struc,index)=>{
+
+          let sel = users.find(item => item.ID===struc.ID)
+          //console.log(sel)
+           return (
+             <View style={{ 
+               flexDirection:"row",
+               alignItems:"center",
+               justifyContent:"space-between"
+             }}>
+             <Text>{sel?.Name} :  {prixPerPerson }</Text>
+             {
+               !struc.Payed  && struc.Name=="Amine" ? (
+                 <Button title="Pay" onPress={()=>{
+                   struc.Payed=true;
+                   fetchedData.Structure = JSON.stringify(Str);
+                   //console.log(fetchedData)
+                   db.UpdateItem("Expense",{Structure:JSON.stringify(Str)},"PaymentTransaction = '"+fetchedData.PaymentTransaction+"'")
+                   
+                 }} />
+               ) : (
+                 <Text>Not</Text>
+               )
+             }
+             
+             </View>
+           )
+         })
+
+       )
 
           
         

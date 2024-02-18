@@ -11,18 +11,16 @@ export interface IData {
 class Database {
   db: SQLite.Database;
 
-  
-  destroy(){
 
-  }
+
   constructor() {
     this.db = SQLite.openDatabase('ExpensesTrackers.db');
-    
+
 
   }
 
   createTableManually = (tableName: string) => {
-    
+
     this.db.transaction(tx => {
       tx.executeSql(
         tableName
@@ -39,11 +37,11 @@ class Database {
     });
     console.log("Data base Created")
   };
-  fetchDataQuery  = (query: string, setData: React.Dispatch<React.SetStateAction<IData[]>>,
-   
-    ) => {
-      
-      
+  fetchDataQuery = (query: string, setData: React.Dispatch<React.SetStateAction<IData[]>>
+
+  ) => {
+
+
     this.db.transaction(tx => {
       tx.executeSql(query, [], (_, { rows }) => {
         const items: IData[] = [];
@@ -51,25 +49,22 @@ class Database {
           items.push(rows.item(i));
         }
         setData(items);
-        console.log(items)
+
       });
     });
   };
   fetchData = (tableName: string, setData: React.Dispatch<React.SetStateAction<IData[]>>,
-    data?:Partial<IData>
-    ) => {
-      let values:any=[]
-      let columns:string;
-      if(data!=null)
-      {
-        
+    data?: Partial<IData>
+  ) => {
+    let values: any = []
+    let columns: string;
+    if (data != null) {
+      columns = "WHERE " + Object.keys(data).join(' = ? AND ') + "= ?";
+      values = Object.values(data);
+      console.log("columns: ", columns + " = ?")
+      console.log(`SELECT * FROM ${tableName} ${columns} ;`, values)
 
-       columns = "WHERE "+Object.keys(data).join(' = ? AND ')+"= ?";
-       values = Object.values(data);
-      console.log("columns: ",columns+" = ?")
-      console.log(`SELECT * FROM ${tableName} ${columns} ;`,values)
-
-      }
+    }
     this.db.transaction(tx => {
       tx.executeSql(`SELECT * FROM ${tableName} ${columns} ;`, values, (_, res) => {
         const items: IData[] = [];
@@ -88,16 +83,46 @@ class Database {
     const values = Object.values(data);
     this.db.transaction(tx => {
       tx.executeSql(`INSERT INTO ${tableName} (${columns}) VALUES (${placeholders});`,
-       values, 
-       (txtObj, res) => {
-        alert("This Item add With Id : "+res.insertId)
-        if(fetchData!=null) fetchData();
-      }
+        values,
+        (txtObj, res) => {
+          alert("This Item add With Id : " + res.insertId)
+          if (fetchData != null) fetchData();
+        }
 
-      
+
+      );
+    });
+  };
+
+
+  UpdateItem = (tableName: string, data: Partial<IData>, WhereClause: string) => {
+
+    let columns = Object.keys(data).join(' = ? AND ') + "= ?";
+    let values = Object.values(data);
+
+
+
+    console.log(`UPDATE ${tableName}
+    SET ${columns}
+    WHERE
+       ${WhereClause} `, values)
+
+    this.db.transaction(tx => {
+      tx.executeSql(`UPDATE ${tableName}
+      SET ${columns}
+      WHERE
+         ${WhereClause} `,
+        values,
+        (txtObj, res) => {
+          alert("This Item add With Id : ")
+          console.log(res)
+
+        }
+
+
       );
     });
   };
 }
 
-export const db:Database = new Database();
+export const db: Database = new Database();

@@ -20,7 +20,12 @@ export interface Expense {
   catID: number
 }
 
+type Payed ={
+  ID:number
+  Name:string
+  Payed:boolean
+}
 export interface StrType {
   shared:number[],
-  Payed:number[]
+  Payed:Payed[]
  }

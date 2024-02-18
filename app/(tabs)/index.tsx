@@ -60,7 +60,8 @@ export default function TabOneScreen() {
     SELECT * from Expense, subCategory, category
     WHERE Expense.IdSubCat=subCategory.ID AND subCategory.catID=category.ID
     AND strftime('%m', DateExpense) =  strftime('%m', datetime('now','localtime'))
-    order by DateExpense DESC`, SetExpenseList);
+    order by DateExpense DESC
+    `, SetExpenseList);
     //console.log(ExpenseList)
 
 
@@ -68,20 +69,32 @@ export default function TabOneScreen() {
     let debt = 0
     let credit = 0
     ExpenseList.map((item, index) => {
-      console.log("add", ExpenseList)
+      //console.log("add", ExpenseList)
       let usercreadit = JSON.parse(item.Structure);
 
       if (item.PayedBy === selectedUser) {
         exp += item.Amount;
-        let userLenght = usercreadit.shared.length;
+        let userLenght = usercreadit.Payed.length;
+        //console.log("=====",usercreadit.Payed.length)
         if (userLenght > 0) {
-          credit += item.Amount / (userLenght + 1) * userLenght;
+          for(let i = 0 ; i<userLenght; i++){
+            if(!usercreadit.Payed[i].Payed){
+              credit += item.Amount / (userLenght + 1);
 
+            }else{
+              exp -= item.Amount / (userLenght + 1);
+            }
+
+          }
+          //credit += item.Amount / (userLenght + 1) * userLenght;
+
+          
+          
         }
         console.log("User by me",)
 
       }
-      else debt += (item.Amount / (usercreadit.shared.length + 1));
+      else debt += (item.Amount / (usercreadit.Payed.length + 1));
       //console.log(usercreadit.shared.length)
 
     })

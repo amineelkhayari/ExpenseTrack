@@ -39,7 +39,7 @@ export default function ModalScreen() {
       SetTest(va)
       SetPayTransaction(va + new Date().getTime())
       fetchData();
-      db.fetchDataQuery("select * from subCategory",SetsubCateList);
+      db.fetchDataQuery("select * from subCategory", SetsubCateList);
       return va;
       //console.log(selectedUser,"Value get from Storage",va)
     }
@@ -48,45 +48,50 @@ export default function ModalScreen() {
   const [categoryList, SetCategoryList] = useState<IData[]>([]);
   const [catSelected, SetCatSelect] = useState(0);
   const [SubCatSelected, SetSubCatSelect] = useState(0);
+  
 
+  const [testNew, SettestNew] = useState<any[]>([]);
 
   const [ExpenseList, SetExpenseList] = useState<IData[]>([]);
-  const fetchExpense = ()=>{
-    db.fetchData("Expense",SetExpenseList);
+  const fetchExpense = () => {
+    db.fetchData("Expense", SetExpenseList);
   }
 
   const fetchData = () => {
     db.fetchData('category', SetCategoryList);
-    
+
 
     //db.fetchDataQuery("SELECT SUM(Amount) as expense FROM Expense",setTask)
   };
   const add = () => {
 
-    let str:any ={
-      "shared":userSelected,
-      "Payed" :[]
-  }
-    
-    const data={Title:Title, 
-      PaymentTransaction:PayTransaction,
-      PayedBy:PayedBy,
-      Amount:Amount,
-      Structure:JSON.stringify(str),
-      IdSubCat:SubCatSelected
-    }
-    
-    
-      db.addItem('Expense',data,fetchExpense);
-      SetTitle();
-      SetPayTransaction(PayedBy+new Date().getTime())
-      setAmount(0)
-      SetStructure()
-      SetSubCatSelect(0)
-      SetCatSelect(0)
-      setUserSelected([])
+   
 
-     
+    let str: any = {
+      "shared": userSelected,
+      "Payed": testNew
+    }
+
+    const data = {
+      Title: Title,
+      PaymentTransaction: PayTransaction,
+      PayedBy: PayedBy,
+      Amount: Amount,
+      Structure: JSON.stringify(str),
+      IdSubCat: SubCatSelected
+    }
+
+
+    db.addItem('Expense', data, fetchExpense);
+    SetTitle();
+    SetPayTransaction(PayedBy + new Date().getTime())
+    setAmount(0)
+    SetStructure()
+    SetSubCatSelect(0)
+    SetCatSelect(0)
+    setUserSelected([])
+
+
     //console.log(data)
 
     // Create user table
@@ -173,13 +178,26 @@ export default function ModalScreen() {
                   <TouchableOpacity key={i} style={item.isChecked == true && styles.placeSelected} onPress={() => {
                     //user[userSelected].isChecked = !user[userSelected].isChecked;
                     if (userSelected.includes(item.ID) === false) {
-                      console.log("exlude", PayedBy.trim())
+                      //console.log("exlude", PayedBy.trim())
+
                       setUserSelected([...userSelected, item.ID])
+                      
+                      let newT :any =  
+                        {
+                        ID:item.ID,
+                        Name:item.Name,
+                        Payed:false
+                      }
+                      
+                      
+                      testNew.push(newT);
 
                     } else {
                       let clone: any[] = [...userSelected];
                       let index = clone.findIndex(i => i == item.ID);
+                      let indexArr = testNew.findIndex(i=> i.ID === item.ID)
                       clone.splice(index, 1);
+                      testNew.splice(indexArr,1)
                       setUserSelected([...clone])
 
                       console.log(index, 'clone', clone);
@@ -237,7 +255,7 @@ export default function ModalScreen() {
           label="Choose Sub Cat"
           value={0}
         />
-        {subCateList.filter(cat=>cat.catID=== catSelected).map((cat, index) => {
+        {subCateList.filter(cat => cat.catID === catSelected).map((cat, index) => {
           return (
             <Picker.Item
               key={cat.ID}
@@ -255,7 +273,7 @@ export default function ModalScreen() {
 
           onPress={() => {
             add();
-            
+
             // Update the chart data to reflect the new expense
 
           }}
@@ -266,7 +284,8 @@ export default function ModalScreen() {
         {/* Cancel button to close the form
 					without adding an expense */}
         <Button
-          onPress={() => { fetchExpense()}}
+          onPress={() =>console.log(testNew)
+          }
           title="Cancel"
           key="Cancel"
         />

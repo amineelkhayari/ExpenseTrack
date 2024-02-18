@@ -25,6 +25,8 @@ type Props = {
 
 
 
+
+
 type ItemProps = {
   item: Expense;
   onPress: () => void;
@@ -34,21 +36,20 @@ type ItemProps = {
 };
 
 const Item = ({ item,userSelect, onPress, backgroundColor, textColor }: ItemProps) => (
-  <TouchableOpacity onPress={onPress} style={[styles.item, { backgroundColor }]}>
+  <TouchableOpacity onPress={onPress} style={[styles.item, {backgroundColor: item.PayedBy==userSelect ? "red": 'green' }]}>
     <View>
-    <Text style={[ { color: textColor }]}>This Item `{item.Title}`</Text>
-    <Text  style={[ { color: textColor }]}>Payed By: {item.PayedBy}</Text>
-    <Text  style={[ { color: textColor }]}>Payment Transsaction: {item.PaymentTransaction}</Text>
+    <Text style={[ { color: "white" }]}>This Item `{item.Title}({JSON.parse(item.Structure).Payed.length+1})`</Text>
+    <Text  style={[ { color: "white" }]}>Payed By: {item.PayedBy === userSelect ? "Me" : item.PayedBy}</Text>
 
     </View>
     <View>
       
         
       
-    <Text style={[ { color: item.PayedBy==userSelect ? 'red': 'green' }]}>- $ {item.PayedBy==userSelect ? item.Amount : item.Amount/(JSON.parse(item.Structure).shared.length+1)}</Text>
+    <Text style={[ { color:  'white' }]}>- $ {item.PayedBy==userSelect ? item.Amount : item.Amount/(JSON.parse(item.Structure).shared.length+1)}</Text>
     {
       item.PayedBy!=userSelect && (
-        <Text style={[ { color: item.PayedBy== userSelect ? 'red': 'green', textAlign:"center" }]}> / {item.Amount}</Text>
+        <Text style={[ { color: "#fff", textAlign:"center" }]}> / {item.Amount}</Text>
 
       )
     }
