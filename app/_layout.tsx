@@ -1,5 +1,5 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme, NavigationContainer, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -40,7 +40,7 @@ export default function RootLayout() {
 	        ID INTEGER PRIMARY KEY AUTOINCREMENT,
 	        NameCat TEXT NOT NULL UNIQUE
           );`);
-          db.createTableManually(`
+      db.createTableManually(`
           CREATE TABLE if NOT EXISTS subCategory (
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
             NameSubCat TEXT NOT NULL UNIQUE,
@@ -52,7 +52,7 @@ export default function RootLayout() {
             
           );
           `)
-          db.createTableManually(`CREATE TABLE if NOT EXISTS Expense (
+      db.createTableManually(`CREATE TABLE if NOT EXISTS Expense (
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
             Title TEXT,
             PaymentTransaction TEXT UNIQUE,
@@ -85,13 +85,11 @@ function RootLayoutNav() {
     <ThemeProvider value={DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="detail/[id]" options={{ 
-                animation: 'fade',
-
-      headerTransparent:true }} />
+        <Stack.Screen name="detail/[id]" options={{ presentation: 'modal' }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-        
+
       </Stack>
+      
     </ThemeProvider>
   );
 }

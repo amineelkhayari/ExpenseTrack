@@ -1,7 +1,9 @@
 import { Expense, Expenses } from '@/Interfaces/Users';
 import { Link } from 'expo-router';
 import React, { useState } from 'react';
-import {base64} from "@/Interfaces/helper"
+import { base64 } from "@/Interfaces/helper"
+import { router, Navigator, useNavigation } from 'expo-router';
+
 
 import {
   FlatList,
@@ -11,7 +13,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View, Button
 } from 'react-native';
 
 type ItemData = {
@@ -19,8 +21,8 @@ type ItemData = {
   title: string;
 };
 type Props = {
-  expenseList:any,
-  userLocal:string
+  expenseList: any,
+  userLocal: string
 }
 
 
@@ -32,33 +34,56 @@ type ItemProps = {
   onPress: () => void;
   backgroundColor: string;
   textColor: string;
-  userSelect:string
+  userSelect: string
 };
 
-const Item = ({ item,userSelect, onPress, backgroundColor, textColor }: ItemProps) => (
-  <TouchableOpacity onPress={onPress} style={[styles.item, {backgroundColor: item.PayedBy==userSelect ? "red": 'green' }]}>
-    <View>
-    <Text style={[ { color: "white" }]}>This Item `{item.Title}({JSON.parse(item.Structure).Payed.length+1})`</Text>
-    <Text  style={[ { color: "white" }]}>Payed By: {item.PayedBy === userSelect ? "Me" : item.PayedBy}</Text>
+const Item = ({ item, userSelect, onPress, backgroundColor, textColor }: ItemProps) => (
+  <>
+    <Button title="With Short Id" onPress={() => {
+      router.push({
+        pathname: `/tes/dtshoert`, params: { id: item.PaymentTransaction }
 
-    </View>
-    <View>
-      
-        
-      
-    <Text style={[ { color:  'white' }]}>- $ {item.PayedBy==userSelect ? item.Amount : item.Amount/(JSON.parse(item.Structure).shared.length+1)}</Text>
-    {
-      item.PayedBy!=userSelect && (
-        <Text style={[ { color: "#fff", textAlign:"center" }]}> / {item.Amount}</Text>
 
-      )
-    }
-    </View>
+      });
+    }} />
+    <Button title="Without Qr Code" onPress={() => {
+      router.push({
+        pathname: `/tes/detailWithoutQrCode`, params: { id: base64.atob(JSON.stringify(item)) }
 
-  </TouchableOpacity>
+
+      });
+    }} />
+    <Button title="With Qr Code" onPress={() => {
+      router.push({
+        pathname: `/tes/detail`, params: { id: base64.atob(JSON.stringify(item)), user: userSelect }
+      });
+
+    }} />
+
+    <TouchableOpacity onPress={onPress} style={[styles.item, { backgroundColor: item.PayedBy == userSelect ? "red" : 'green' }]}>
+      <View>
+        <Text style={[{ color: "white" }]}>This Item `{item.Title}({JSON.parse(item.Structure).Payed.length + 1})`</Text>
+        <Text style={[{ color: "white" }]}>Payed By: {item.PayedBy === userSelect ? "Me" : item.PayedBy}</Text>
+
+      </View>
+      <View>
+
+
+
+        <Text style={[{ color: 'white' }]}>- $ {item.PayedBy == userSelect ? item.Amount : item.Amount / (JSON.parse(item.Structure).shared.length + 1)}</Text>
+        {
+          item.PayedBy != userSelect && (
+            <Text style={[{ color: "#fff", textAlign: "center" }]}> / {item.Amount}</Text>
+
+          )
+        }
+      </View>
+
+    </TouchableOpacity>
+  </>
 );
 
-const CustomListItem = ({expenseList,userLocal}:Props) => {
+const CustomListItem = ({ expenseList, userLocal }: Props) => {
   const [selectedId, setSelectedId] = useState<number>();
 
   const renderItem = ({ item }: { item: Expense }) => {
@@ -66,17 +91,17 @@ const CustomListItem = ({expenseList,userLocal}:Props) => {
     const color = item.ID === selectedId ? 'white' : 'black';
 
     return (
-      <Link href={`/detail/${base64.atob(JSON.stringify(item))}`} asChild>
+      // <Link href={`/detail/${base64.atob(JSON.stringify(item))}`} asChild>
 
-      
+
       <Item
         item={item}
         userSelect={userLocal}
-        onPress={() => setSelectedId(item.ID)}
+        onPress={() => router.navigate(`/detail/${base64.atob(JSON.stringify(item))}`)}
         backgroundColor={backgroundColor}
         textColor={color}
       />
-</Link>
+
     );
   };
 
@@ -85,11 +110,11 @@ const CustomListItem = ({expenseList,userLocal}:Props) => {
       <FlatList
         data={expenseList}
         renderItem={renderItem}
-      
+
         keyExtractor={item => item.PaymentTransaction}
         extraData={selectedId}
       />
-     
+
     </SafeAreaView>
   );
 };
@@ -103,9 +128,9 @@ const styles = StyleSheet.create({
     padding: 20,
     marginVertical: 8,
     marginHorizontal: 16,
-    flexDirection:'row',
-    justifyContent:"space-between",
-    alignItems:"center"
+    flexDirection: 'row',
+    justifyContent: "space-between",
+    alignItems: "center"
   },
   title: {
     fontSize: 20,

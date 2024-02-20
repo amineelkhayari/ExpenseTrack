@@ -1,7 +1,6 @@
 import React, { useState, useEffect, FC } from 'react';
 import { View, Text, Button, TextInput } from 'react-native';
 import { db, IData } from '@/Interfaces/DbSet';
-import CustomListItem from '@/components/CustomListing';
 import { Picker } from '@react-native-picker/picker';
 
 
@@ -25,7 +24,7 @@ export default function Test() {
     const fetchData = () => {
         db.fetchData('subCategory', setTasks);
         db.fetchData('category', setTask);
-        
+
 
         //db.fetchDataQuery("SELECT SUM(Amount) as expense FROM Expense",setTask)
     };
@@ -59,14 +58,14 @@ export default function Test() {
                     );
                 })}
             </Picker>
-            <Text>Category:</Text>
+            <Text>Choose Category:</Text>
             <TextInput value={Category}
                 placeholder='food'
                 onChangeText={(val) => SetCategory(val)} />
             {tasks.map(task => (
                 <Text key={task.ID}>{task.ID}:{task.NameSubCat}</Text>
             ))}
-            <Button onPress={addTask} title="Add Task" />
+            <Button onPress={addTask} title="Add Subcategory" />
         </View>
     );
 };
