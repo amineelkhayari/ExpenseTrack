@@ -1,11 +1,11 @@
 import { useLocalSearchParams, useNavigation } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, View, Text, StyleSheet, Dimensions} from 'react-native';
 import { base64 } from "@/Interfaces/helper"
 import QRCode from 'react-native-qrcode-svg';
 import {  StrType } from '@/Interfaces/Users';
 import { users } from '@/constants/user';
-import {db } from '@/Interfaces/DbSet';
+import {IData, db } from '@/Interfaces/DbSet';
 
 
 const IMG_HEIGHT = 300;
@@ -17,10 +17,20 @@ const detailPage = () => {
   const fetchedData:any = JSON.parse(base64.btoa(params.id as string));
   const Str:StrType = JSON.parse(fetchedData.Structure);
   const prixPerPerson = fetchedData.Amount / (Str.Payed.length+1)
+  const [t, setTask] = useState<IData[]>([]);
 
- 
+  useEffect(() => {
+    fetchData();
+}, []);
 
-  
+
+const fetchData = () => {
+  //db.fetchData('subCategory', setTasks);
+  db.fetchDataQuery(`SELECT * FROM Expense WHERE PaymentTransaction = '${fetchedData.PaymentTransaction}'`, setTask)
+console.log("aaa",t)
+
+  //db.fetchDataQuery("SELECT SUM(Amount) as expense FROM Expense",setTask)
+};
 
  
 
@@ -31,6 +41,7 @@ const detailPage = () => {
     <View style={{
       flex:1
     }} >
+      <Text>{JSON.stringify(t)}</Text>
       
       <Text> Payment Transaction : {fetchedData.PaymentTransaction} </Text>
       <Text> Title               : {fetchedData.Title}              </Text>

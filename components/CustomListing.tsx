@@ -31,36 +31,20 @@ type Props = {
 
 type ItemProps = {
   item: Expense;
-  onPress: () => void;
-  backgroundColor: string;
-  textColor: string;
+
   userSelect: string
 };
 
-const Item = ({ item, userSelect, onPress, backgroundColor, textColor }: ItemProps) => (
+const Item = ({ item, userSelect }: ItemProps) => (
   <>
-    <Button title="With Short Id" onPress={() => {
-      router.push({
-        pathname: `/tes/dtshoert`, params: { id: item.PaymentTransaction }
 
 
-      });
-    }} />
-    <Button title="Without Qr Code" onPress={() => {
-      router.push({
-        pathname: `/tes/detailWithoutQrCode`, params: { id: base64.atob(JSON.stringify(item)) }
-
-
-      });
-    }} />
-    <Button title="With Qr Code" onPress={() => {
+    <TouchableOpacity onPress={() => {
       router.push({
         pathname: `/tes/detail`, params: { id: base64.atob(JSON.stringify(item)), user: userSelect }
       });
 
-    }} />
-
-    <TouchableOpacity onPress={onPress} style={[styles.item, { backgroundColor: item.PayedBy == userSelect ? "red" : 'green' }]}>
+    }} style={[styles.item, { backgroundColor: item.PayedBy == userSelect ? "red" : 'green' }]}>
       <View>
         <Text style={[{ color: "white" }]}>This Item `{item.Title}({JSON.parse(item.Structure).Payed.length + 1})`</Text>
         <Text style={[{ color: "white" }]}>Payed By: {item.PayedBy === userSelect ? "Me" : item.PayedBy}</Text>
@@ -97,9 +81,7 @@ const CustomListItem = ({ expenseList, userLocal }: Props) => {
       <Item
         item={item}
         userSelect={userLocal}
-        onPress={() => router.navigate(`/detail/${base64.atob(JSON.stringify(item))}`)}
-        backgroundColor={backgroundColor}
-        textColor={color}
+       
       />
 
     );

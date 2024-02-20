@@ -82,7 +82,7 @@ class Database {
     const placeholders = Object.keys(data).fill('?').join(',');
     const values = Object.values(data);
     this.db.transaction(tx => {
-      tx.executeSql(`INSERT INTO ${tableName} (${columns}) VALUES (${placeholders});`,
+      tx.executeSql(`INSERT or replace INTO ${tableName} (${columns}) VALUES (${placeholders});`,
         values,
         (txtObj, res) => {
           alert("This Item add With Id : " + res.insertId)
@@ -93,7 +93,27 @@ class Database {
       );
     });
   };
+  deleteItem = (tableName: string, data: Partial<IData>, fetchData: () => void) => {
+    
+    let values: any = []
+    let columns: string;
+    
+      columns = "WHERE " + Object.keys(data).join(' = ? AND ') + "= ?";
+      values = Object.values(data);
+      console.log(columns,values)
 
+    this.db.transaction(tx => {
+      tx.executeSql(`DELETE FROM  ${tableName} ${columns};`,
+        values,
+        (txtObj, res) => {
+          console.log("This Item add With Id : " + res.rows._array)
+          fetchData();
+        }
+
+
+      );
+    });
+  };
 
   UpdateItem = (tableName: string, data: Partial<IData>, WhereClause: string) => {
 

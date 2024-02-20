@@ -2,6 +2,7 @@ import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link, Tabs } from 'expo-router';
 import { Pressable } from 'react-native';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 
 
@@ -19,8 +20,6 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: "#333",
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
         headerShown: true,
       }}>
       <Tabs.Screen
@@ -45,10 +44,26 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="category"
         options={{
           title: 'Category',
-          tabBarIcon: ({ color }) => <TabBarIcon name="trophy" color={color} />,
+          tabBarIcon: ({ color }) => <MaterialIcons name="category" size={30} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="subCategory"
+        options={{
+          title: 'Sub Category',
+          tabBarIcon: ({ color }) => <MaterialIcons name="category" size={30} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="importData"
+        options={{
+          title: 'Import Data',
+          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="database-import-outline" size={24} color="black" />
+
+          ,
         }}
       />
     </Tabs>
