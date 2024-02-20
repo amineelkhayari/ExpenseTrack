@@ -22,6 +22,16 @@ export default function TabLayout() {
         tabBarActiveTintColor: "#333",
         headerShown: true,
       }}>
+         <Tabs.Screen
+        name="transaction"  
+      
+        options={{
+          headerTitle:"aa",
+          headerShown:false,
+          title: 'History',
+          tabBarIcon: ({ color }) => <MaterialIcons name="history" size={30} color={color} />,
+        }}
+      />
       <Tabs.Screen
         name="index"
         options={{
@@ -43,6 +53,7 @@ export default function TabLayout() {
           ),
         }}
       />
+     
       <Tabs.Screen
         name="category"
         options={{

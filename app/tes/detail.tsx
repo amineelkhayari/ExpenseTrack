@@ -41,7 +41,6 @@ console.log("aaa",t)
     <View style={{
       flex:1
     }} >
-      <Text>{JSON.stringify(t)}</Text>
       
       <Text> Payment Transaction : {fetchedData.PaymentTransaction} </Text>
       <Text> Title               : {fetchedData.Title}              </Text>
