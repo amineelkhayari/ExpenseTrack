@@ -8,7 +8,7 @@ export interface IData {
   [key: string]: any;
 }
 
-class Database {
+export class Database {
   db: SQLite.Database;
 
 

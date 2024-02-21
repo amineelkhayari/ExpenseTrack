@@ -3,13 +3,14 @@ import React, { useEffect, useState } from 'react';
 import { Button, StyleSheet, Text, View, StatusBar, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Avatar, RadioButton } from 'react-native-paper';
-import { str } from '@/Interfaces/Storage';
+import { Calculate, str } from '@/Interfaces/Storage';
 import { Feather } from '@expo/vector-icons';
 import CustomListItem from '@/components/CustomListing';
 import Selection from '@/components/Selection';
 import { IData, db } from '@/Interfaces/DbSet';
 import { Expense, Expenses } from '@/Interfaces/Users';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { router } from 'expo-router';
 
 
 type Props = {
@@ -23,9 +24,10 @@ export default function TabOneScreen() {
   const [t, SetT] = useState(false);
 
 
-  const [Expensed, SetExpensed] = useState(0);
+  const [Expensed, SetExpensed]: any = useState(0.0);
   const [Credit, SetCredit]: any = useState(0.0);
   const [debt, Setdebt]: any = useState(0.0);
+  const [calculate, SetCalculate] = useState<Calculate>();
 
   const [test, SetTest] = useState(async () => {
     let va = await str.getData('Use')
@@ -52,10 +54,9 @@ export default function TabOneScreen() {
     fetchExpense()
 
 
+  }, [ExpenseList]);
 
-  }, []);
-
-  const fetchExpense = () => {
+  const fetchExpense = async () => {
     db.fetchDataQuery(`
     SELECT * from Expense, subCategory, category
     WHERE Expense.IdSubCat=subCategory.ID AND subCategory.catID=category.ID
@@ -63,75 +64,80 @@ export default function TabOneScreen() {
     order by DateExpense DESC
     `, SetExpenseList);
     //console.log(ExpenseList)
+    let va = await str.getData('Use')
+    setselectedUser(va)
 
 
-    let exp = 0
-    let debt = 0
-    let credit = 0
-    let diff = 0;
-    ExpenseList.map((item, index) => {
-      //console.log("add", ExpenseList)
-      let usercreadit = JSON.parse(item.Structure);
+    //console.log(str.CalculateExpense(selectedUser,ExpenseList))
+
+    // let exp = 0
+    // let debt = 0
+    // let credit = 0
+    // let diff = 0;
+    // ExpenseList.map((item, index) => {
+    //   //console.log("add", ExpenseList)
+    //   let usercreadit = JSON.parse(item.Structure);
 
 
-      if (item.PayedBy === selectedUser) {
-        exp += item.Amount;
-        let userLenght = usercreadit.Payed.length;
-        //console.log("=====",usercreadit.Payed.length)
-        if (userLenght > 0) {
-          for (let i = 0; i < userLenght; i++) {
-            if (!usercreadit.Payed[i].Payed) {
-              credit += item.Amount / (userLenght + 1);
+    //   if (item.PayedBy === selectedUser) {
+    //     exp += item.Amount;
+    //     let userLenght = usercreadit.Payed.length;
+    //     //console.log("=====",usercreadit.Payed.length)
+    //     if (userLenght > 0) {
+    //       for (let i = 0; i < userLenght; i++) {
+    //         if (!usercreadit.Payed[i].Payed) {
+    //           credit += item.Amount / (userLenght + 1);
 
-            } else {
-              exp -= item.Amount / (userLenght + 1);
-            }
+    //         } else {
+    //           exp -= item.Amount / (userLenght + 1);
+    //         }
 
-          }
-          //credit += item.Amount / (userLenght + 1) * userLenght;
-        }
-        console.log("User by me",)
+    //       }
+    //       //credit += item.Amount / (userLenght + 1) * userLenght;
+    //     }
+    //     console.log("User by me",)
 
-      }
-      else {
-        let userLenght = usercreadit.Payed.length;
-        //debt += item.Amount / (userLenght + 1);
-        //console.log("=====",usercreadit.Payed.length)
-        if (userLenght > 0) {
-          //exp += item.Amount / (userLenght + 1);
+    //   }
+    //   else {
+    //     let userLenght = usercreadit.Payed.length;
+    //     //debt += item.Amount / (userLenght + 1);
+    //     //console.log("=====",usercreadit.Payed.length)
+    //     if (userLenght > 0) {
+    //       //exp += item.Amount / (userLenght + 1);
 
-          for (let i = 0; i < userLenght; i++) {
-            //alert(selectedUser)
-            if(usercreadit.Payed[i].Name === selectedUser){
-              //console.log(usercreadit.Payed[i].Payed)
-              if(usercreadit.Payed[i].Payed){
-                console.log("expense: "+(exp+item.Amount/(userLenght+1)))
-                exp += item.Amount/(userLenght+1)
-              }else{
-                console.log("Debts: "+item.Amount/(userLenght+1))
-                debt+=item.Amount/(userLenght+1);
+    //       for (let i = 0; i < userLenght; i++) {
+    //         //alert(selectedUser)
+    //         if(usercreadit.Payed[i].Name === selectedUser){
+    //           //console.log(usercreadit.Payed[i].Payed)
+    //           if(usercreadit.Payed[i].Payed){
+    //             //console.log("expense: "+(exp+item.Amount/(userLenght+1)))
+    //             exp += item.Amount/(userLenght+1)
+    //           }else{
+    //             //console.log("Debts: "+item.Amount/(userLenght+1))
+    //             debt+=item.Amount/(userLenght+1);
 
-              }
-
-             
-            }
-            
-
-          }
-          //credit += item.Amount / (userLenght + 1) * userLenght;
-        }
+    //           }
 
 
-      }
-      //console.log(usercreadit.shared.length)
-
-    })
+    //         }
 
 
-    SetExpensed(exp)
-    Setdebt(debt)
-    SetCredit(credit);
-    console.log("Expense: ", exp, "Debt", debt)
+    //       }
+    //       //credit += item.Amount / (userLenght + 1) * userLenght;
+    //     }
+
+
+    //   }
+    //   //console.log(usercreadit.shared.length)
+
+    // })
+    str.CalculateExpense(selectedUser, ExpenseList, SetCalculate)
+
+
+    SetExpensed(calculate?.Expense)
+    Setdebt(calculate?.Debt)
+    SetCredit(calculate?.Credit);
+    //console.log("Expense: ", exp, "Debt", debt)
 
 
   }
@@ -217,45 +223,60 @@ export default function TabOneScreen() {
                 </TouchableOpacity>
               </View>
 
-              <View style={styles.cardTop}>
 
-                <Text style={{ textAlign: 'center', color: 'aliceblue', flexDirection: "row", justifyContent: "space-between" }}>
-                  Total Expense
+              <TouchableOpacity onPress={() => {
+              
+        
+              }} >
+                <View style={styles.cardTop}>
 
-                </Text>
-                <Text style={{ fontSize: 20, textAlign: 'center', color: 'aliceblue' }}>
-                  $ {Expensed}
-                </Text>
-              </View>
+                  <Text style={{ textAlign: 'center', color: 'aliceblue', flexDirection: "row", justifyContent: "space-between" }}>
+                    Total Expense
+
+                  </Text>
+                  <Text style={{ fontSize: 20, textAlign: 'center', color: 'aliceblue' }}>
+                    $ {Expensed}
+                  </Text>
+                </View>
+
+              </TouchableOpacity>
 
               <View style={styles.cardBottom}>
-                <View>
-                  <View style={styles.cardBottomSame}>
-                    <Feather name='arrow-down' size={18} color='green' />
-                    <Text
-                      style={{
-                        textAlign: 'center',
-                        marginLeft: 5,
-                      }}
-                    >
-                      Credits
+
+                <TouchableOpacity onPress={()=> ""}>
+                  <View>
+                    <View style={styles.cardBottomSame}>
+                      <Feather name='arrow-down' size={18} color='green' />
+                      <Text
+                        style={{
+                          textAlign: 'center',
+                          marginLeft: 5,
+                        }}
+                      >
+                        Credits
+                      </Text>
+                    </View>
+                    <Text style={{ textAlign: 'center' }}>
+                      $ {Credit}
                     </Text>
                   </View>
-                  <Text style={{ textAlign: 'center' }}>
-                    $ {Credit}
-                  </Text>
-                </View>
-                <View>
-                  <View style={styles.cardBottomSame}>
-                    <Feather name='arrow-up' size={18} color='red' />
-                    <Text style={{ textAlign: 'center', marginLeft: 5 }}>
-                      Debts
+                </TouchableOpacity>
+                <TouchableOpacity onPress={()=>router.push({
+                pathname: `/tr`, params: { name:'"debt' }
+              })}>
+                  <View>
+                    <View style={styles.cardBottomSame}>
+                      <Feather name='arrow-up' size={18} color='red' />
+                      <Text style={{ textAlign: 'center', marginLeft: 5 }}>
+                        Debts
+                      </Text>
+                    </View>
+                    <Text style={{ textAlign: 'center' }}>
+                      $ {debt}
                     </Text>
                   </View>
-                  <Text style={{ textAlign: 'center' }}>
-                    $ {debt}
-                  </Text>
-                </View>
+                </TouchableOpacity>
+
               </View>
             </View>
             {/* Start for Recent Transaction */}
@@ -266,7 +287,9 @@ export default function TabOneScreen() {
               </Text>
               <TouchableOpacity
                 activeOpacity={0.5}
-                onPress={() => ""}
+                onPress={() =>   router.push({
+                  pathname: `/tr`
+                })}
               >
                 <Text style={styles.seeAll}>See All</Text>
               </TouchableOpacity>

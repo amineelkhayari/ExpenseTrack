@@ -7,61 +7,40 @@ const transaction = () => {
         <SafeAreaView
             style={styles.container}>
             <View style={styles.header}>
+                <Text>{Date()}</Text>
                 
             </View>
             <View style={styles.boxContainer}>
                 <View style={{
                     flexDirection: 'row'
                 }}>
-                    <View style={{ flexBasis: "33%" }}>
+                    <View style={{ flexBasis: "100%" }}>
                         <Picker
                             style={{ width: "100%" }}
                         >
                             <Picker.Item
                                 key={0}
-                                label="Today"
-                                value="Today"
+                                label="Daily"
+                                value="Daily"
                             />
                             <Picker.Item
                                 key={0}
-                                label="YesterDay"
-                                value="YesterDay"
+                                label="Weekly"
+                                value="Weekly"
                             />
                             <Picker.Item
                                 key={0}
-                                label="Week"
-                                value="Week"
+                                label="Monthly"
+                                value="Monthly"
                             />
                             <Picker.Item
                                 key={0}
-                                label="Month"
-                                value="Month"
+                                label="Yearly"
+                                value="Yearly"
                             />
                         </Picker>
                     </View>
-                    <View style={{ flexBasis: "33%" }}>
-                        <Picker
-                            style={{ width: "100%" }}
-                        >
-                            <Picker.Item
-                                key={0}
-                                label="Choose Cat"
-                                value={0}
-                            />
-                        </Picker>
-                    </View>
-                    <View style={{ flexBasis: "33%" }}>
-
-                        <Picker
-                            style={{ width: "100%" }}
-                        >
-                            <Picker.Item
-                                key={0}
-                                label="Choose Cat"
-                                value={0}
-                            />
-                        </Picker>
-                    </View>
+                  
                 </View>
                 <View style={styles.box}>
                     <View style={styles.inner}>
