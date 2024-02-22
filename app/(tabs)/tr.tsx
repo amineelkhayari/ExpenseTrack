@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import { db, IData } from '@/Interfaces/DbSet'; // Assuming this import is correct
 import { Calculate, str } from '@/Interfaces/Storage';
 import { Double } from 'react-native/Libraries/Types/CodegenTypes';
@@ -35,19 +35,65 @@ export default function App() {
     let users: any = JSON.parse(item.Structure).Payed;
     let lengthUser: number = users.length;
     return (
-      <View style={{ marginLeft: 20 }}>
-        <Text>{`${item.Title}: $${(item.Amount).toFixed(2)} / ${lengthUser + 1} / ${item.PayedBy}`}</Text>
-        <View style={{ flexDirection: 'row', justifyContent: "space-evenly" }}>
+      <View style={{
+        marginLeft: 20, backgroundColor: item.PayedBy != selectedUser ? '#fff' : '#f3f3f3',
+        borderRadius: 14,
+        margin: 10,
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        shadowOffset: {
+          width: 2,
+          height: 2,
+        },
+        gap: 20,
+        padding:10
+      }}>
+        <View style={{}}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <Text> Title        : {`${item.Title}`}</Text>
+            <Text> Totale Price : ${(item.Amount).toFixed(2)}</Text>
+
+          </View>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+
+            <Text> Payed By: {item.PayedBy} </Text>
+            <Text>Users Lenght: {lengthUser + 1}</Text>
+          </View>
+        </View>
+
+        <View style={{
+          flexDirection: 'row', justifyContent: "space-evenly",
+
+          backgroundColor: '#fff',
+          borderRadius: 14,
+          margin: 10,
+          elevation: 4,
+          shadowColor: '#000',
+          shadowOpacity: 0.3,
+          shadowRadius: 4,
+          shadowOffset: {
+            width: 2,
+            height: 2,
+          },
+          gap: 20,
+          padding: 10
+
+        }}>
           {lengthUser > 0 &&
             users.map((it: any) => {
               if (it.Name === selectedUser)
-                return <>
-                  <Text style={{ color: it.Payed ? "green" : "red" }}>{it.Name}/ {item.Amount / (lengthUser + 1)}</Text>
-                </>
+                return <View style={{ alignItems: "center" }}>
+                  <Text style={{ color: it.Payed ? "green" : "red" }}>{it.Name}</Text>
+                  <Text>{item.Amount / (lengthUser + 1)}</Text>
+
+                </View>
               if (item.PayedBy === selectedUser)
-                return <>
-                  <Text style={{ color: it.Payed ? "green" : "red" }}>{it.Name}/ {item.Amount / (lengthUser + 1)}</Text>
-                </>
+                return <View style={{ alignItems: "center" }}>
+                  <Text style={{ color: it.Payed ? "green" : "red" }}>{it.Name}</Text>
+                  <Text>{item.Amount / (lengthUser + 1)}</Text>
+                </View>
             })
           }
         </View>
@@ -131,6 +177,25 @@ export default function App() {
   }
 
   const toggleDetails = async () => {
+    let query: string = "";
+    switch (params?.name) {
+      case "debt":
+        query = `SELECT *,strftime('%Y-%m-%d', DateExpense) as 'date'
+        FROM Expense  WHERE strftime('%m', DateExpense) = strftime('%m', datetime('now','localtime'))
+        GROUP BY  DateExpense
+        ORDER BY  DateExpense DESC`
+        break;
+      case "credit":
+        break;
+      default:
+        query = `SELECT *,strftime('%Y-%m-%d', DateExpense) as 'date'
+        FROM Expense  WHERE strftime('%m', DateExpense) = strftime('%m', datetime('now','localtime'))
+        AND
+        PayedBy !="${selectedUser}"
+        GROUP BY  DateExpense
+        ORDER BY  DateExpense DESC`
+    }
+
 
     let req = params?.name == undefined ? `SELECT *,strftime('%Y-%m-%d', DateExpense) as 'date'
     FROM Expense  WHERE strftime('%m', DateExpense) = strftime('%m', datetime('now','localtime'))
@@ -159,22 +224,33 @@ export default function App() {
   };
 
   return (
-    <View style={{}}>
-      <Text>{selectedUser} Expense: {ExpenseAmount} || Debt Amount : {DebtAmount} Craedit: {CreditAmount}</Text>
-      {dt.map((item, index) => (
-        <View >
-          <TouchableOpacity
-            style={{ backgroundColor: '#ccc', padding: 10 }}
-          >
-            <Text>{item.date}</Text>
-          </TouchableOpacity>
-          <FlatList
-            data={item.data}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.data}
-          />
-        </View>
-      ))}
-    </View>
+    <ScrollView>
+
+
+      <View style={{}}>
+        <Text>{selectedUser} Expense: {ExpenseAmount} || Debt Amount : {DebtAmount} Craedit: {CreditAmount}</Text>
+        {dt.map((item, index) => {
+
+          const expensebydate: Calculate = str.CalculateExpense(selectedUser, item.data)
+          return (
+            <View >
+              <View
+                style={{ backgroundColor: '#ccc', padding: 10, flexDirection: 'row', justifyContent: 'space-around' }}
+              >
+                <Text>{item.date}</Text>
+                <Text>Expense: ${expensebydate.Expense} | Credit: ${expensebydate.Credit}| Debt: ${expensebydate.Debt}</Text>
+              </View>
+              <FlatList
+                data={item.data}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.data}
+              />
+            </View>
+          )
+        }
+
+        )}
+      </View>
+    </ScrollView>
   );
 }

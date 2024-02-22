@@ -166,6 +166,7 @@ class Storage extends Database {
     )
     let res:Calculate = {Expense:exp,Credit:credit, Debt:debt}
     if(setData != null) setData(res)
+    return res;
     // setDebtsAmount(debt)
     // setExpenseAmount(exp)
     // setCreditAmount(credit)
